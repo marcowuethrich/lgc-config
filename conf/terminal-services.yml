@@ -1,0 +1,3 @@
+terminal:
+  backend:
+    base: http://81.221.33.116:9300/gcws-rest/services/GatewayService/doTrans

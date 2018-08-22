@@ -1,0 +1,19 @@
+zuul:
+  routes:
+    services:
+      path: /services/**
+      url: $(OWMS_EUREKA_URL:http://lgc-sharedcloudservices-ch-gcaas-services:8080)
+      stripPrefix: true
+    eureka:
+      path: /eureka/**
+      url: $(OWMS_EUREKA_URL:http://lgc-sharedcloudservices-ch-gcaas-services:8080)
+      stripPrefix: false
+
+server:
+  port: 8080
+
+owms:
+  edge:
+    protocol: http
+    host: lgc-sharedcloudservices-ch-gcaas-api
+    port: 8080

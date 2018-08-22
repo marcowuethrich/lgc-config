@@ -1,0 +1,138 @@
+zuul:
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 60000
+  sensitive-headers: Cookie,Set-Cookie
+  ssl-hostname-validation-enabled: false
+  add-host-header: true
+  add-proxy-headers: true
+  ignoredServices: '*'
+  routes:
+
+# Business API
+    bapi-ui:
+      path: /portal/bapi/**
+      serviceId: business-implementation
+      stripPrefix: true
+    api-configuration:
+      path: /bapi/**
+      serviceId: business-implementation
+      stripPrefix: true
+    api-index:
+      path: /index
+      serviceId: business-implementation
+      stripPrefix: false
+    api-cards-index:
+      path: /cards/index
+      serviceId: business-implementation
+      stripPrefix: false
+    api-cards:
+      path: /cards/**
+      serviceId: business-implementation
+      stripPrefix: false
+    api-products-index:
+      path: /products/index
+      serviceId: business-implementation
+      stripPrefix: false
+    api-products:
+      path: /products/**
+      serviceId: business-implementation
+      stripPrefix: false
+    api-transactions:
+      path: /transactions/**
+      serviceId: business-implementation
+      stripPrefix: false
+    api-transactions-index:
+      path: /transactions/index
+      serviceId: business-implementation
+      stripPrefix: false
+
+# Domain Admin Service      
+    das:
+      path: /portal/das/**
+      serviceId: domain-administration
+      stripPrefix: true
+    schemas:
+      path: /api/schemas/**
+      serviceId: domain-administration
+      stripPrefix: true
+    versions:
+      path: /api/versions/**
+      serviceId: domain-administration
+      stripPrefix: true
+      
+# Portal      
+    ui:
+      path: /portal/**
+      serviceId: portal
+      stripPrefix: true
+    view-objects:
+      path: /api/view-objects/**
+      serviceId: portal
+      stripPrefix: true
+      
+# Voucher Service
+    vouchers:
+      path: /api/vouchers/**
+      serviceId: vouchers
+      stripPrefix: true
+
+proxy:
+  auth:
+    routes:
+      api-index: none
+      api-cards-index: none
+      api-cards: oauth2
+      api-products-index: none
+      api-products: passthru
+      api-transactions-index: none
+      api-transactions: oauth2
+      ui: oauth2
+      das: oauth2
+      view-objects: oauth2
+      vouchers: oauth2
+      services: oauth2
+      eureka: oauth2
+ribbon:
+  eureka:
+    enabled: true
+  client:
+    healthcheck:
+      enabled: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+    
+server:
+  use-forward-headers: true
+
+security:
+  basic:
+    enabled: false
+  user:
+    password: ${SECURITY_USER_PASSWORD:sa}
+  oauth2:
+    resource:
+      user-info-uri: https://auth.os.gcaas.ch/auth/realms/${TENANT_ID:CS}/protocol/openid-connect/userinfo
+      token-info-uri: https://auth.os.gcaas.ch/auth/realms/${TENANT_ID:CS}/protocol/openid-connect/token
+      jwk:
+        key-set-uri: https://auth.os.gcaas.ch/auth/realms/${TENANT_ID:c-jucker-1}/protocol/openid-connect/certs
+      jwt:
+        key-uri: https://auth.os.gcaas.ch/auth/realms/${TENANT_ID:CS}
+        key-value:
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwZUNrLAw9JtUJ3DdpJnLC2/giNRftzGSgj9s6Tu4M/sJ271d598ypcoizl7LFVFt6rAYML3Gtqw6KRQ70u6XcbQFStjv9OQSeWm48MeyYokKAEauPAW1zuLjCjVX2qUR4ToapQ65OWxxqB0uof5/1BQ6l/+TQ8EroihX7Kyh3GrOWgZI46SRE7oSHxYEfx43ky/UCujuzsPBHJjpntx0AUc4kHlnQt50Yi8svzSJnVY0ithyjxtQR2aK14vbZ8i0+kId4OoDSXSEuk5S66bW9Y0JYjjx7Ssv343HXEg5d8Dv6pWWWxIgTM7LEZsW3N2GwVPEnOjwzoTFxfRcTChGlQIDAQAB
+          -----END PUBLIC KEY-----
+  enable-csrf: false
+  sessions: never
+eureka:
+  instance:
+    metadata-map:
+      username: user
+      password: ${SECURITY_USER_PASSWORD:sa}
+      protocol: http
